@@ -13,7 +13,9 @@ class DatasetGenerator(object):
     def __remove_duplicates(data_frame):
         data_frame.drop_duplicates(subset=Cols.ID, keep=False, inplace=True)
 
-    def __compute_and_add_metadata_to(self, data_frame):
+    # TODO: Needs to be implemented to add Behavioral Features
+    @staticmethod
+    def __compute_and_add_metadata_to(data_frame):
         pass
 
     @staticmethod
@@ -35,8 +37,8 @@ class DatasetGenerator(object):
         else:
             data_frame[Cols.LABEL] = data_frame[Cols.LABEL].map(Constants.label_value)
 
-    def generate(self):
-        dataset = pd.read_csv(Constants.PATH_TO_DATASET)
+    def generate(self, path=Constants.PATH_TO_DATASET):
+        dataset = pd.read_csv(path)
         self.__remove_duplicates(dataset)
         self.__compute_and_add_metadata_to(dataset)
         dataset = self.__filter_rows_by_type_of_labels(dataset)

@@ -1,4 +1,6 @@
 class Constants:
+    max_features = 3000
+
     class Cols:
         ID = 'Review ID'
         REVIEW = 'Review'
