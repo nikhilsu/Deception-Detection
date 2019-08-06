@@ -51,10 +51,8 @@ def train_and_evaluate(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--path_to_dataset',
-                        default='/Users/nikhilsulegaon/Downloads/BLT-C_Boulder_Lies_and_Truths_Corpus.csv',
-                        required=False)
-    parser.add_argument('--treat_F_as_deceptive', default=False, required=False)
+    parser.add_argument('--path_to_dataset', required=True)
+    parser.add_argument('--treat_F_as_deceptive', required=True)
     parser.add_argument('--batch_size', default=32, required=False)
     parser.add_argument('--epochs', default=1000, required=False)
     parser.add_argument('--train_split', default=0.85, required=False)
