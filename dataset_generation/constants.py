@@ -1,4 +1,6 @@
 class Constants:
+    NUM_BEHAVIORAL_FEATURES = 1
+    BI_LSTM_OUT_DIM = 100
     SEED = 786
     TRAIN_SIZE = 0.85
     MAX_FEATURES = 3000
