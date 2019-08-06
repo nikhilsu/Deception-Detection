@@ -45,18 +45,19 @@ class Dataset(object):
         return self.__get(Constants.Cols.LABEL, train=False)
 
 
-def gen_dataset():
+def gen_dataset(treat_F_as_deceptive):
     nltk.download('wordnet')
     nltk.download('stopwords')
     stop_words = set(stopwords.words('english'))
     generator = RawData()
     processor = ReviewsPreprocessor(text, stop_words, wordnet)
     vocab = Tokenizer(num_words=Constants.MAX_FEATURES)
-    df = generator.generate()
+
+    df = generator.generate(treat_F_as_deceptive)
     reviews = list(processor.process(df[Constants.Cols.REVIEW]))
     vocab.fit_on_texts(reviews)
     encoded_reviews = vocab.texts_to_sequences(reviews)
-    df[Constants.Cols.REVIEW] = list(pad_sequences(encoded_reviews))
+    df[Constants.Cols.REVIEW] = list(pad_sequences(encoded_reviews, maxlen=Constants.MAX_LEN))
     df_train, df_test = train_test_split(df, train_size=Constants.TRAIN_SIZE,
                                          random_state=Constants.SEED)
     return Dataset(df_train, df_test, vocab)

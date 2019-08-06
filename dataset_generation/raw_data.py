@@ -37,12 +37,12 @@ class RawData(object):
         else:
             data_frame[Cols.LABEL] = data_frame[Cols.LABEL].map(Constants.label_value)
 
-    def generate(self, path=Constants.PATH_TO_DATASET):
+    def generate(self, treat_F_as_deceptive=False, path=Constants.PATH_TO_DATASET,):
         dataset = pd.read_csv(path)
         self.__remove_duplicates(dataset)
         self.__compute_and_add_metadata_to(dataset)
         dataset = self.__filter_rows_by_type_of_labels(dataset)
         dataset = self.__select_necessary_columns(dataset)
         self.__transform_values_of_sentiment_columns(dataset)
-        self.__transform_values_of_label(dataset, treat_F_as_deceptive=False)
+        self.__transform_values_of_label(dataset, treat_F_as_deceptive=treat_F_as_deceptive)
         return dataset
