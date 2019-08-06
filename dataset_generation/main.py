@@ -1,5 +1,6 @@
 import nltk
 import numpy as np
+from keras.utils import to_categorical
 from keras_preprocessing import text
 from keras_preprocessing.sequence import pad_sequences
 from keras_preprocessing.text import Tokenizer
@@ -13,15 +14,21 @@ from dataset_generation.raw_data import RawData
 
 
 class Dataset(object):
-    def __init__(self, df_train, df_test, tokens):
+    def __init__(self, df_train, df_test, tokens, treat_F_as_deceptive):
         self.df_train = df_train
         self.df_test = df_test
         self.tokens = tokens
+        self.treat_F_as_deceptive = treat_F_as_deceptive
 
     def __get(self, column_list, train):
         data_frame = self.df_train if train else self.df_test
         data = data_frame[column_list]
         return np.asarray(data.tolist()) if isinstance(data, Series) else data.values
+
+    def __categorize_if_needed(self, labels):
+        if not self.treat_F_as_deceptive:
+            return to_categorical(labels, 3)
+        return labels
 
     def vocabulary_len(self):
         return len(self.tokens.word_index) + 1
@@ -39,10 +46,10 @@ class Dataset(object):
         return self.__get([Constants.Cols.SENTIMENT], train=False)
 
     def y_train(self):
-        return self.__get(Constants.Cols.LABEL, train=True)
+        return self.__categorize_if_needed(self.__get(Constants.Cols.LABEL, train=True))
 
     def y_test(self):
-        return self.__get(Constants.Cols.LABEL, train=False)
+        return self.__categorize_if_needed(self.__get(Constants.Cols.LABEL, train=False))
 
 
 def gen_dataset(treat_F_as_deceptive):
@@ -60,4 +67,4 @@ def gen_dataset(treat_F_as_deceptive):
     df[Constants.Cols.REVIEW] = list(pad_sequences(encoded_reviews, maxlen=Constants.MAX_LEN))
     df_train, df_test = train_test_split(df, train_size=Constants.TRAIN_SIZE,
                                          random_state=Constants.SEED)
-    return Dataset(df_train, df_test, vocab)
+    return Dataset(df_train, df_test, vocab, treat_F_as_deceptive)

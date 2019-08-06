@@ -1,6 +1,5 @@
 from keras import Input, Model
 from keras.layers import Embedding, Bidirectional, TimeDistributed, Flatten, Dense, LSTM, Concatenate
-from keras.utils import to_categorical
 
 from dataset_generation import gen_dataset
 from dataset_generation.constants import Constants
@@ -8,18 +7,9 @@ from dataset_generation.constants import Constants
 treat_F_as_deceptive = False
 
 dataset = gen_dataset(treat_F_as_deceptive)
-y_train = dataset.y_train()
-y_test = dataset.y_test()
 
-if treat_F_as_deceptive:
-    output_dim_nn = 1
-    model_loss_function = 'binary_crossentropy'
-
-else:
-    output_dim_nn = 3
-    model_loss_function = 'categorical_crossentropy'
-    y_train = to_categorical(y_train, 3)
-    y_test = to_categorical(y_test, 3)
+output_dim_nn = 1 if treat_F_as_deceptive else 3
+model_loss_function = 'binary_crossentropy' if treat_F_as_deceptive else 'categorical_crossentropy'
 
 # Bidirectional LSTM to learn Linguistic features
 bi_lstm_in = Input(shape=(Constants.MAX_LEN,))
@@ -42,12 +32,12 @@ model = Model([bi_lstm_in, nn_input], nn_output)
 model.compile(loss=model_loss_function, optimizer='adam', metrics=['accuracy'])
 model.summary()
 
-model.fit([dataset.x_linguistic_train(), dataset.x_behavioral_train()], y_train,
+model.fit([dataset.x_linguistic_train(), dataset.x_behavioral_train()], dataset.y_train(),
           batch_size=Constants.BATCH_SIZE,
           validation_split=Constants.VALIDATION_SPLIT,
           epochs=Constants.EPOCHS)
 
-loss, accuracy = model.evaluate([dataset.x_linguistic_test(), dataset.x_behavioral_test()], y_test,
+loss, accuracy = model.evaluate([dataset.x_linguistic_test(), dataset.x_behavioral_test()], dataset.y_test(),
                                 batch_size=Constants.BATCH_SIZE,
                                 verbose=2)
 
