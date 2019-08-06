@@ -1,11 +1,5 @@
 import argparse
 
-from keras import Input, Model
-from keras.layers import Embedding, Bidirectional, TimeDistributed, Flatten, Dense, LSTM, Concatenate
-
-from dataset_generation import gen_dataset
-from dataset_generation.constants import Constants
-
 
 def train_and_evaluate(args):
     dataset = gen_dataset(args.path_to_dataset, args.train_split, args.treat_F_as_deceptive)
@@ -60,5 +54,10 @@ if __name__ == '__main__':
     parser.add_argument('--output_dims', default=100, required=False)
 
     cmd_args = parser.parse_args()
+
+    from keras import Input, Model
+    from keras.layers import Embedding, Bidirectional, TimeDistributed, Flatten, Dense, LSTM, Concatenate
+    from dataset_generation import gen_dataset
+    from dataset_generation.constants import Constants
 
     train_and_evaluate(cmd_args)
