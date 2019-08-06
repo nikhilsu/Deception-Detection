@@ -1,10 +1,4 @@
-import nltk
-from keras_preprocessing import text
 from nltk.corpus import stopwords
-from nltk.corpus import wordnet
-
-from constants import Constants
-from data_generator import DatasetGenerator
 
 
 class ReviewsPreprocessor(object):
@@ -26,14 +20,3 @@ class ReviewsPreprocessor(object):
 
     def process(self, reviews):
         return reviews.apply(self.__tokenize)
-
-
-if __name__ == '__main__':
-    nltk.download('wordnet')
-    nltk.download('stopwords')
-    stopwords = set(stopwords.words('english'))
-    processor = ReviewsPreprocessor(text, stopwords, wordnet)
-    generator = DatasetGenerator()
-    df = generator.generate()
-    df[Constants.Cols.REVIEW] = processor.process(df[Constants.Cols.REVIEW])
-    print(df.head())
