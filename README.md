@@ -6,7 +6,7 @@ A Machine learning model to detect deceptive(fake) Hotel and Electronic reviews
 
 ### Model Architecture:
 
-![Model Architecture](https://raw.githubusercontent.com/nikhilsu/Deception-Detection/blob/master/model.png)
+<img src="https://github.com/nikhilsu/Deception-Detection/raw/master/model.png" alt="Model Architecture" width="300"/>
 
 ### Project Dependencies:
 - The project dependencies(python libraries) can be installed by running the following command:-
