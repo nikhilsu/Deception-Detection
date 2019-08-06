@@ -4,41 +4,54 @@ from keras.layers import Embedding, Bidirectional, TimeDistributed, Flatten, Den
 from dataset_generation import gen_dataset
 from dataset_generation.constants import Constants
 
-treat_F_as_deceptive = False
 
-dataset = gen_dataset(treat_F_as_deceptive)
+def train_and_evaluate(args):
+    dataset = gen_dataset(args.path_to_dataset, args.train_split, args.treat_F_as_deceptive)
 
-output_dim_nn = 1 if treat_F_as_deceptive else 3
-model_loss_function = 'binary_crossentropy' if treat_F_as_deceptive else 'categorical_crossentropy'
+    bi_lstm_out_dim = args.output_dims
+    num_behavioral_features = dataset.num_of_behavioral_features()
+    output_dim_nn = 1 if args.treat_F_as_deceptive else 3
+    model_loss_function = 'binary_crossentropy' if args.treat_F_as_deceptive else 'categorical_crossentropy'
 
-# Bidirectional LSTM to learn Linguistic features
-bi_lstm_in = Input(shape=(Constants.MAX_LEN,))
-lstm_model = Embedding(dataset.vocabulary_len(), Constants.BI_LSTM_OUT_DIM, input_length=Constants.MAX_LEN)(bi_lstm_in)
-lstm_model = Bidirectional(LSTM(Constants.BI_LSTM_OUT_DIM, return_sequences=True, dropout=0.25, recurrent_dropout=0.1))(
-    lstm_model)
-lstm_model = TimeDistributed(Dense(Constants.BI_LSTM_OUT_DIM, activation='relu'))(lstm_model)
-lstm_model = Flatten()(lstm_model)
-bi_lstm_output = Dense(Constants.BI_LSTM_OUT_DIM, activation='relu')(lstm_model)
+    # Bidirectional LSTM to learn Linguistic features
+    bi_lstm_in = Input(shape=(Constants.MAX_LEN,))
+    lstm_model = Embedding(dataset.vocabulary_len(), bi_lstm_out_dim, input_length=Constants.MAX_LEN)(bi_lstm_in)
+    lstm_model = Bidirectional(LSTM(bi_lstm_out_dim, return_sequences=True, dropout=0.25, recurrent_dropout=0.1))(
+        lstm_model)
+    lstm_model = TimeDistributed(Dense(bi_lstm_out_dim, activation='relu'))(lstm_model)
+    lstm_model = Flatten()(lstm_model)
+    bi_lstm_output = Dense(bi_lstm_out_dim, activation='relu')(lstm_model)
 
-# 2-Layer NN to learn Behavioral features and output of Bi-LSTM to classify
-nn_input_dim = Constants.NUM_BEHAVIORAL_FEATURES + Constants.BI_LSTM_OUT_DIM
-nn_input = Input(shape=(Constants.NUM_BEHAVIORAL_FEATURES,))
-nn_model = Concatenate()([nn_input, bi_lstm_output])
-nn_model = Dense(12, input_dim=nn_input_dim, activation='relu')(nn_model)
-nn_model = Dense(8, activation='relu')(nn_model)
-nn_output = Dense(output_dim_nn, activation='sigmoid')(nn_model)
+    # 2-Layer NN to learn Behavioral features and output of Bi-LSTM to classify
+    nn_input_dim = num_behavioral_features + bi_lstm_out_dim
+    nn_input = Input(shape=(num_behavioral_features,))
+    nn_model = Concatenate()([nn_input, bi_lstm_output])
+    nn_model = Dense(12, input_dim=nn_input_dim, activation='relu')(nn_model)
+    nn_model = Dense(8, activation='relu')(nn_model)
+    nn_output = Dense(output_dim_nn, activation='sigmoid')(nn_model)
 
-model = Model([bi_lstm_in, nn_input], nn_output)
-model.compile(loss=model_loss_function, optimizer='adam', metrics=['accuracy'])
-model.summary()
+    model = Model([bi_lstm_in, nn_input], nn_output)
+    model.compile(loss=model_loss_function, optimizer='adam', metrics=['accuracy'])
+    print('Model Summary:- \n\n')
+    model.summary()
 
-model.fit([dataset.x_linguistic_train(), dataset.x_behavioral_train()], dataset.y_train(),
-          batch_size=Constants.BATCH_SIZE,
-          validation_split=Constants.VALIDATION_SPLIT,
-          epochs=Constants.EPOCHS)
+    model.fit([dataset.x_linguistic_train(), dataset.x_behavioral_train()], dataset.y_train(),
+              batch_size=args.batch_size,
+              validation_split=args.validation_split,
+              epochs=args.epochs)
 
-loss, accuracy = model.evaluate([dataset.x_linguistic_test(), dataset.x_behavioral_test()], dataset.y_test(),
-                                batch_size=Constants.BATCH_SIZE,
-                                verbose=2)
+    loss, accuracy = model.evaluate([dataset.x_linguistic_test(), dataset.x_behavioral_test()], dataset.y_test(),
+                                    batch_size=args.batch_size,
+                                    verbose=2)
 
-print('Test Accuracy: {:.3f}%'.format(accuracy * 100))
+    print('Test Accuracy: {:.3f}%'.format(accuracy * 100))
+
+
+if __name__ == '__main__':
+    EPOCHS = 10
+    BATCH_SIZE = 32
+    NUM_BEHAVIORAL_FEATURES = 1
+    BI_LSTM_OUT_DIM = 100
+    TRAIN_SPLIT = 0.85
+    VALIDATION_SPLIT = 0.1
+    PATH_TO_DATASET = '/Users/nikhilsulegaon/Downloads/BLT-C_Boulder_Lies_and_Truths_Corpus.csv'

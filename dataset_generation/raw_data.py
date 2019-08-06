@@ -37,7 +37,7 @@ class RawData(object):
         else:
             data_frame[Cols.LABEL] = data_frame[Cols.LABEL].map(Constants.label_value)
 
-    def generate(self, treat_F_as_deceptive=False, path=Constants.PATH_TO_DATASET,):
+    def generate(self, path, treat_F_as_deceptive):
         dataset = pd.read_csv(path)
         self.__remove_duplicates(dataset)
         self.__compute_and_add_metadata_to(dataset)
