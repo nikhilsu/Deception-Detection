@@ -2,6 +2,7 @@ class Constants:
     SEED = 786
     TRAIN_SIZE = 0.85
     MAX_FEATURES = 3000
+    MAX_LEN = 300
 
     class Cols:
         ID = 'Review ID'

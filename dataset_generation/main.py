@@ -13,14 +13,18 @@ from dataset_generation.raw_data import RawData
 
 
 class Dataset(object):
-    def __init__(self, df_train, df_test):
+    def __init__(self, df_train, df_test, tokens):
         self.df_train = df_train
         self.df_test = df_test
+        self.tokens = tokens
 
     def __get(self, column_list, train):
         data_frame = self.df_train if train else self.df_test
         data = data_frame[column_list]
         return np.asarray(data.tolist()) if isinstance(data, Series) else data.values
+
+    def vocabulary_len(self):
+        return len(self.tokens.word_index) + 1
 
     def x_linguistic_train(self):
         return self.__get(Constants.Cols.REVIEW, train=True)
@@ -41,7 +45,7 @@ class Dataset(object):
         return self.__get(Constants.Cols.LABEL, train=False)
 
 
-def main():
+def gen_dataset():
     nltk.download('wordnet')
     nltk.download('stopwords')
     stop_words = set(stopwords.words('english'))
