@@ -1,13 +1,13 @@
 import numpy as np
 import pandas as pd
 
-from constants import Constants
+from dataset_generation.constants import Constants
 
 # Constants
 Cols = Constants.Cols
 
 
-class DatasetGenerator(object):
+class RawData(object):
 
     @staticmethod
     def __remove_duplicates(data_frame):
