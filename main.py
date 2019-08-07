@@ -15,6 +15,7 @@ def train_and_evaluate(args):
     lstm_model = Bidirectional(LSTM(bi_lstm_out_dim, return_sequences=True, dropout=0.25, recurrent_dropout=0.1))(
         lstm_model)
     lstm_model = TimeDistributed(Dense(bi_lstm_out_dim, activation='relu'))(lstm_model)
+    lstm_model = MaxPool1D(3)(lstm_model)
     lstm_model = Flatten()(lstm_model)
     bi_lstm_output = Dense(bi_lstm_out_dim, activation='relu')(lstm_model)
 
@@ -23,6 +24,7 @@ def train_and_evaluate(args):
     nn_input = Input(shape=(num_behavioral_features,))
     nn_model = Concatenate()([nn_input, bi_lstm_output])
     nn_model = Dense(12, input_dim=nn_input_dim, activation='relu')(nn_model)
+    nn_model = Dropout(0.25)(nn_model)
     nn_model = Dense(8, activation='relu')(nn_model)
     nn_output = Dense(output_dim_nn, activation='sigmoid')(nn_model)
 
@@ -30,6 +32,9 @@ def train_and_evaluate(args):
     model.compile(loss=model_loss_function, optimizer='adam', metrics=['accuracy'])
     print('Model Summary:- \n\n')
     model.summary()
+    # For model visualization:-
+    # from keras.utils import plot_model
+    # plot_model(model, to_file='model.png')
 
     model.fit([dataset.x_linguistic_train(), dataset.x_behavioral_train()], dataset.y_train(),
               batch_size=args.batch_size,
@@ -56,7 +61,8 @@ if __name__ == '__main__':
     cmd_args = parser.parse_args()
 
     from keras import Input, Model
-    from keras.layers import Embedding, Bidirectional, TimeDistributed, Flatten, Dense, LSTM, Concatenate
+    from keras.layers import Embedding, Bidirectional, TimeDistributed
+    from keras.layers import Flatten, Dense, LSTM, Concatenate, Dropout, MaxPool1D
     from dataset_generation import gen_dataset
     from dataset_generation.constants import Constants
 
