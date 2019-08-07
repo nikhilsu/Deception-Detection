@@ -49,4 +49,5 @@ class RawData(object):
         dataset = self.__select_necessary_columns(dataset)
         self.__transform_values_of_sentiment_columns(dataset)
         self.__transform_values_of_label(dataset, treat_F_as_deceptive=treat_F_as_deceptive)
+        dataset.reset_index(drop=True)
         return dataset

@@ -6,8 +6,8 @@ def train_and_evaluate(args):
     num_behavioral_features = len(Constants.Cols.BEHAVIORAL_COLS)
     output_dim_nn = 1 if args.treat_F_as_deceptive else 3
     model_loss_function = 'binary_crossentropy' if args.treat_F_as_deceptive else 'categorical_crossentropy'
-
-    for dataset in gen_dataset(args.path_to_dataset, args.k_folds, args.treat_F_as_deceptive):
+    cross_validation_accuracies = []
+    for i, dataset in enumerate(gen_dataset(args.path_to_dataset, args.k_folds, args.treat_F_as_deceptive)):
         # Bidirectional LSTM to learn Linguistic features
         bi_lstm_in = Input(shape=(Constants.MAX_LEN,))
         lstm_model = Embedding(dataset.vocabulary_len(), bi_lstm_out_dim, input_length=Constants.MAX_LEN)(bi_lstm_in)
@@ -45,7 +45,11 @@ def train_and_evaluate(args):
                                         batch_size=args.batch_size,
                                         verbose=2)
 
-        print('Test Accuracy: {:.3f}%'.format(accuracy * 100))
+        print('Test Accuracy CV - {}: {:.3f}%'.format(i, accuracy * 100))
+        cross_validation_accuracies.append(accuracy * 100)
+
+    print("Avg Test Acc after Cross Validation: {:.2f}% +/-{:.2f}%".format(np.mean(cross_validation_accuracies),
+                                                                           np.std(cross_validation_accuracies)))
 
 
 if __name__ == '__main__':
@@ -53,13 +57,14 @@ if __name__ == '__main__':
     parser.add_argument('--path_to_dataset', required=True)
     parser.add_argument('--treat_F_as_deceptive', required=True)
     parser.add_argument('--batch_size', default=32, required=False)
-    parser.add_argument('--epochs', default=1000, required=False)
+    parser.add_argument('--epochs', default=50, required=False)
     parser.add_argument('--k_folds', default=10, required=False)
     parser.add_argument('--validation_split', default=0.1, required=False)
     parser.add_argument('--output_dims', default=100, required=False)
 
     cmd_args = parser.parse_args()
 
+    import numpy as np
     from keras import Input, Model
     from keras.layers import Embedding, Bidirectional, TimeDistributed
     from keras.layers import Flatten, Dense, LSTM, Concatenate, Dropout, MaxPool1D
