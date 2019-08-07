@@ -18,16 +18,25 @@ def train_and_evaluate(args):
         lstm_model = Flatten()(lstm_model)
         bi_lstm_output = Dense(bi_lstm_out_dim, activation='relu')(lstm_model)
 
-        # 2-Layer NN to learn Behavioral features and output of Bi-LSTM to classify
-        nn_input_dim = num_behavioral_features + bi_lstm_out_dim
-        nn_input = Input(shape=(num_behavioral_features,))
-        nn_model = Concatenate()([nn_input, bi_lstm_output])
-        nn_model = Dense(12, input_dim=nn_input_dim, activation='relu')(nn_model)
-        nn_model = Dropout(0.25)(nn_model)
-        nn_model = Dense(8, activation='relu')(nn_model)
-        nn_output = Dense(output_dim_nn, activation='sigmoid')(nn_model)
+        if args.use_bi_lstm_only:
+            main_model_input = bi_lstm_in
+            main_model_output = Dense(output_dim_nn, activation='sigmoid')(bi_lstm_output)
+            dataset_input = dataset.x_linguistic_train()
 
-        model = Model([bi_lstm_in, nn_input], nn_output)
+        else:
+            # 2-Layer NN to learn Behavioral features and output of Bi-LSTM to classify
+            nn_input_dim = num_behavioral_features + bi_lstm_out_dim
+            nn_input = Input(shape=(num_behavioral_features,))
+            nn_model = Concatenate()([nn_input, bi_lstm_output])
+            nn_model = Dense(12, input_dim=nn_input_dim, activation='relu')(nn_model)
+            nn_model = Dropout(0.25)(nn_model)
+            nn_model = Dense(8, activation='relu')(nn_model)
+            nn_output = Dense(output_dim_nn, activation='sigmoid')(nn_model)
+            main_model_input = [bi_lstm_in, nn_input]
+            main_model_output = nn_output
+            dataset_input = [dataset.x_linguistic_train(), dataset.x_behavioral_train()]
+
+        model = Model(main_model_input, main_model_output)
         model.compile(loss=model_loss_function, optimizer='adam', metrics=['accuracy'])
         print('Model Summary:- \n\n')
         model.summary()
@@ -36,7 +45,8 @@ def train_and_evaluate(args):
         # from keras.utils import plot_model
         # plot_model(model, to_file='model.png')
 
-        model.fit([dataset.x_linguistic_train(), dataset.x_behavioral_train()], dataset.y_train(),
+
+        model.fit(dataset_input, dataset.y_train(),
                   batch_size=args.batch_size,
                   validation_split=args.validation_split,
                   epochs=args.epochs)
@@ -56,6 +66,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--path_to_dataset', required=True)
     parser.add_argument('--treat_F_as_deceptive', required=True)
+    parser.add_argument('--use_bi_lstm_only', default=False, required=False,
+                        help='Use this option to train only the Bi-directional LSTM model with the dataset')
     parser.add_argument('--batch_size', default=32, required=False)
     parser.add_argument('--epochs', default=50, required=False)
     parser.add_argument('--k_folds', default=10, required=False)
