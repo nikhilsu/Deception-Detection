@@ -15,8 +15,7 @@ class Constants:
         REVIEW = 'Review'
         SENTIMENT = 'Sentiment Polarity'
         LABEL = 'Truth Value'
-        BEHAVIORAL_COLS = [SENTIMENT, DOMAIN, REVIEW_COUNT, REVIEW_LEN, MEAN_SIM_SCORE, STD_SIM_SCORE,
-                           TIME_TO_WRITE_REVIEW]
+        BEHAVIORAL_COLS = [SENTIMENT, DOMAIN, REVIEW_COUNT, REVIEW_LEN, MEAN_SIM_SCORE, STD_SIM_SCORE]
 
     @staticmethod
     def label_value(label):
