@@ -26,11 +26,15 @@ class RawData(object):
         return data_frame[[Cols.REVIEW] + Cols.BEHAVIORAL_COLS + [Cols.LABEL]]
 
     @staticmethod
-    def __transform_values_of_sentiment_columns(data_frame):
+    def __transform_values_of_sentiment_column(data_frame):
         data_frame[Cols.SENTIMENT] = np.where(data_frame[Cols.SENTIMENT] == 'pos', 1, 0)
 
     @staticmethod
-    def __transform_values_of_domain_columns(data_frame):
+    def __transform_type_of_time_column(data_frame):
+        data_frame[Cols.TIME_TO_WRITE_REVIEW] = data_frame[Cols.TIME_TO_WRITE_REVIEW].astype('int64')
+
+    @staticmethod
+    def __transform_values_of_domain_column(data_frame):
         data_frame[Cols.DOMAIN] = np.where(data_frame[Cols.DOMAIN] == 'Hotels', 1, 0)
 
     @staticmethod
@@ -71,15 +75,15 @@ class RawData(object):
         self.__normalize_series(data_frame, Cols.MEAN_SIM_SCORE)
         self.__normalize_series(data_frame, Cols.STD_SIM_SCORE)
 
-
     def generate(self, path, treat_F_as_deceptive):
         dataset = pd.read_csv(path)
         self.__remove_duplicates(dataset)
         self.__compute_and_add_metadata_to(dataset)
         dataset = self.__filter_rows_by_type_of_labels(dataset)
         dataset = self.__select_necessary_columns(dataset)
-        self.__transform_values_of_sentiment_columns(dataset)
-        self.__transform_values_of_domain_columns(dataset)
+        self.__transform_values_of_sentiment_column(dataset)
+        self.__transform_type_of_time_column(dataset)
+        self.__transform_values_of_domain_column(dataset)
         self.__transform_values_of_label(dataset, treat_F_as_deceptive=treat_F_as_deceptive)
         dataset.reset_index(drop=True)
         return dataset
