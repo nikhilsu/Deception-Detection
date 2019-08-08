@@ -45,7 +45,6 @@ def train_and_evaluate(args):
         # from keras.utils import plot_model
         # plot_model(model, to_file='model.png')
 
-
         model.fit(dataset_input, dataset.y_train(),
                   batch_size=args.batch_size,
                   validation_split=args.validation_split,
