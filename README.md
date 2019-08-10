@@ -24,3 +24,14 @@ $ pip install -r requirements.txt
 ```bash
 $ python main.py --path_to_dataset "<path to the BLT dataset>" --treat_F_as_deceptive <True/False>
 ```
+
+### References
+- [A Tangled Web: The Faint Signals of Deception in Text - Boulder Lies and Truth Corpus (BLT-C)](http://www.lrec-conf.org/proceedings/lrec2016/summaries/1203.html)
+- [V. Sandifer, Anna & Wilson, Casey & Olmsted, Aspen. (2017). Detection of fake online hotel reviews](https://www.researchgate.net/profile/Aspen_Olmsted/publication/325075174_Detection_of_fake_online_hotel_reviews/links/5b68a939299bf14c6d94f4b2/Detection-of-fake-online-hotel-reviews.pdf)
+- [A. Mukherjee, V. Venkataraman, B. Liu and N. Glance, "Fake Review Detection: Classification and Analysis of Real and Pseudo Reviews](http://www2.cs.uh.edu/~arjun/papers/UIC-CS-TR-yelp-spam.pdf)
+- [Automatic detection of deceptive opinions using automatically identified specific details Nikolai Vogler](https://pdfs.semanticscholar.org/c05d/42ded4f7423c785f50a06633679fd36b5ca5.pdf)
+- [Sentence classification using Bi-LSTM](https://towardsdatascience.com/sentence-classification-using-bi-lstm-b74151ffa565)
+- [From Word Embeddings To Document Distances](http://proceedings.mlr.press/v37/kusnerb15.pdf)
+- [Gensim](https://radimrehurek.com/gensim/models/word2vec.html)
+- [bidirectional LSTM + keras](https://www.kaggle.com/snlpnkj/bidirectional-lstm-keras)
+- [Evaluate the Performance Of Deep Learning Models in Keras](https://machinelearningmastery.com/evaluate-performance-deep-learning-models-keras/)
