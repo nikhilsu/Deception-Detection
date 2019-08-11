@@ -1,5 +1,7 @@
 # Deception-Detection
-A Machine learning model to detect deceptive(fake) Hotel and Electronic reviews
+A Machine learning model to detect deceptive(fake) Hotel and Electronic reviews.
+
+Link to report: [Report.pdf](https://github.com/nikhilsu/Deception-Detection/raw/master/Report.pdf)
 
 ### Dataset Used:
 [Boulder Lies and Truth dataset](https://catalog.ldc.upenn.edu/LDC2014T24)
